@@ -304,12 +304,26 @@
             const voiceId = voiceSelect.value;
 
             if (!apiKey) {
-                alert('⚠️ Please enter your ElevenLabs API key');
+                alert('Please enter your ElevenLabs API key');
                 return;
             }
 
             if (!text) {
-                alert('⚠️ Please enter some text to convert to speech');
+                alert('Please enter some text to convert to speech');
+                return;
+            }
+
+            // Clean and validate API key - remove any non-ASCII characters
+            const cleanApiKey = apiKey.replace(/[^\x00-\x7F]/g, '').trim();
+            
+            if (!cleanApiKey) {
+                alert('Invalid API key format. Please copy your API key again without any special characters or emojis.');
+                return;
+            }
+
+            // Validate API key format (should start with sk_)
+            if (!cleanApiKey.startsWith('sk_')) {
+                alert('API key should start with "sk_". Please check your key.');
                 return;
             }
 
@@ -326,7 +340,7 @@
                         headers: {
                             'Accept': 'audio/mpeg',
                             'Content-Type': 'application/json',
-                            'xi-api-key': apiKey,
+                            'xi-api-key': cleanApiKey,
                         },
                         body: JSON.stringify({
                             text: text,
@@ -351,7 +365,7 @@
                 audioPlayer.classList.remove('hidden');
 
             } catch (error) {
-                alert(`❌ Error: ${error.message}`);
+                alert(`Error: ${error.message}`);
             } finally {
                 generateBtn.disabled = false;
                 loadingState.classList.add('hidden');
